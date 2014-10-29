@@ -6,7 +6,7 @@ import java.util.List;
 public class Split implements Cloneable {
     public List<Integer> attr_index;
     public List<String> attr_value;
-    double entophy;
+    double entropy;
     String classLabel;
 
     Split() {

@@ -4,8 +4,11 @@ import java.io.*;
 import java.util.*;
 import java.lang.Math;
 
-class GainRatio {
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 
+class GainRatio {
     int linenumber = 0;
     static String count[][] = new String[1000][4];
     int currnode[] = new int[100];
@@ -15,7 +18,7 @@ class GainRatio {
         return majorityLabel;
     }
 
-    // Calculation of entropy
+    // Calculation of entrophy
     public double currNodeEntophy() {
         int currentindex = 0;
         double entropy = 0;
@@ -62,7 +65,6 @@ class GainRatio {
 
     public double entropy(int c[]) {
         double entropy = 0;
-
         int i = 0;
         int sum = 0;
         double frac;
@@ -80,17 +82,16 @@ class GainRatio {
     }
 
     public void getcount() {
-        FileInputStream fstream;
         try {
-            fstream = new FileInputStream("/Users/zl/C45/output/intermediate" + Main.current_index + ".txt");
-            DataInputStream in = new DataInputStream(fstream);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String line;
-            // Read File Line By Line
-            StringTokenizer itr;
-            // System.out.println("READING FROM intermediate  "+id.current_index);
+            Configuration config = new Configuration();
+            FileSystem dfs = FileSystem.get(config);
 
+            Path path = new Path("C45/intermediate" + Main.current_index + ".txt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(dfs.open(path)));
+            String line;
+            StringTokenizer itr;
             while ((line = br.readLine()) != null) {
+                System.out.println("In gain Ratio : " + line);
                 itr = new StringTokenizer(line);
                 count[linenumber][0] = itr.nextToken();
                 count[linenumber][1] = itr.nextToken();
@@ -98,11 +99,12 @@ class GainRatio {
                 count[linenumber][3] = itr.nextToken();
                 linenumber++;
             }
+            System.out.println("outsidec while");
             count[linenumber][0] = null;
             count[linenumber][1] = null;
             count[linenumber][2] = null;
             count[linenumber][3] = null;
-            in.close();
+            br.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -128,7 +130,10 @@ class GainRatio {
                     j = 0;
                     m++;
                     currentatrrval = count[i][1];
-                    c[m][j] = Integer.parseInt(count[i][3]);
+                    c[m][j] = Integer.parseInt(count[i][3]); // (different
+                                                             // class) data sets
+                                                             // count per m
+                                                             // index split
                     sum[m] = c[m][j];
                 }
             }
@@ -138,7 +143,6 @@ class GainRatio {
             totalsum = totalsum + sum[p]; // calculating total instance in node
             p++;
         }
-
         double wtenp = 0;
         double splitenp = 0;
         double part = 0;
@@ -171,5 +175,7 @@ class GainRatio {
             }
         }
         return values;
+
     }
+
 }
